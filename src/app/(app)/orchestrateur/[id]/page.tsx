@@ -6,9 +6,10 @@ import { AGENT_BY_SLUG, POLES } from "@/lib/agents";
 import Markdown from "@/components/Markdown";
 import { api, RUN_STATUS, STEP_STATUS, usd } from "@/components/api";
 import Skeleton from "@/components/Skeleton";
+import Activity, { type LiveProgress } from "@/components/Activity";
 
 type Run = { id: string; goal: string; summary: string; status: string; tier: string; web_search: boolean; error: string | null; active: boolean; project: { id: string; name: string } | null; cost_usd: number };
-type Step = { id: string; idx: number; agent_slug: string; mission: string; why: string; status: string; mission_id: string | null; error: string | null; mission_cost: string | null };
+type Step = { id: string; idx: number; agent_slug: string; mission: string; why: string; status: string; mission_id: string | null; error: string | null; mission_cost: string | null; progress?: LiveProgress | null };
 type Draft = { agent: string; mission: string; why: string };
 
 export default function RunPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +35,7 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
     const tick = async () => {
       try {
         const r = await load();
-        if (!stop && (r.status === "running" || r.active)) t = setTimeout(tick, 3000);
+        if (!stop && (r.status === "running" || r.active)) t = setTimeout(tick, 2000);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Plan introuvable.");
       }
@@ -78,10 +79,10 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
       let t: ReturnType<typeof setTimeout>;
       const tick = async () => {
         const x = await load().catch(() => null);
-        if (x && (x.status === "running" || x.active)) t = setTimeout(tick, 3000);
+        if (x && (x.status === "running" || x.active)) t = setTimeout(tick, 2000);
         else router.refresh();
       };
-      t = setTimeout(tick, 3000);
+      t = setTimeout(tick, 2000);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur.");
     } finally {
@@ -126,6 +127,22 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
 
       {run.error && <div className="alert err" style={{ marginBottom: 14 }}>{run.error}</div>}
       {error && <div className="alert err" style={{ marginBottom: 14 }}>{error}</div>}
+
+      {steps.length > 0 && (run.status === "running" || doneCount > 0) && (
+        <div className="run-progress">
+          <div className="row small muted">
+            <span>
+              {run.status === "running"
+                ? `Étape ${Math.min(doneCount + 1, steps.length)} sur ${steps.length} en cours`
+                : `${doneCount} étape${doneCount > 1 ? "s" : ""} terminée${doneCount > 1 ? "s" : ""} sur ${steps.length}`}
+            </span>
+            <span className="spacer mono">{Math.round((doneCount / steps.length) * 100)} %</span>
+          </div>
+          <div className={`run-bar ${run.status === "running" ? "live" : ""}`}>
+            <span style={{ width: `${Math.max(run.status === "running" ? 4 : 0, (doneCount / steps.length) * 100)}%` }} />
+          </div>
+        </div>
+      )}
 
       <div className="row" style={{ marginBottom: 16 }}>
         {editable && !draft && (
@@ -219,7 +236,7 @@ function StepCard({ step }: { step: Step }) {
   }
 
   return (
-    <div className="step">
+    <div className={`step ${step.status === "running" ? "is-running" : step.status === "done" ? "is-done" : ""}`}>
       <span className="n">{step.idx + 1}</span>
       <div className="stack" style={{ gap: 6 }}>
         <h3>
@@ -230,6 +247,7 @@ function StepCard({ step }: { step: Step }) {
         </h3>
         <p>{step.mission}</p>
         {step.why && <p className="why">{step.why}</p>}
+        {step.status === "running" && <Activity progress={step.progress ?? null} color={a?.pole.color} />}
         {step.error && <p className="small" style={{ color: "var(--err)" }}>{step.error}</p>}
         {step.mission_id && (
           <div className="row">

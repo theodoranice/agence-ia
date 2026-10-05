@@ -3,6 +3,7 @@ import { body, isUuid, type Ctx } from "@/lib/http";
 import { one, q, tx } from "@/lib/db";
 import { AGENT_BY_SLUG } from "@/lib/agents";
 import { isRunActive, type RunRow } from "@/lib/orchestrator";
+import { getProgress } from "@/lib/progress";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,12 +18,13 @@ export const GET = handle(async (_req: Request, ctx: Ctx) => {
   const { id } = await ctx.params;
   const run = await ownedRun(id, user.id);
   if (!run) throw new HttpError(404, "Plan introuvable.");
-  const steps = await q(
+  const rows = await q<{ status: string; mission_id: string | null }>(
     `SELECT s.*, m.status AS mission_status, m.cost_usd AS mission_cost
        FROM run_steps s LEFT JOIN missions m ON m.id = s.mission_id
       WHERE s.run_id=$1 ORDER BY s.idx`,
     [id],
   );
+  const steps = rows.map((s) => ({ ...s, progress: s.status === "running" ? getProgress(s.mission_id) : null }));
   const project = run.project_id ? await one("SELECT id, name FROM projects WHERE id=$1", [run.project_id]) : null;
   const cost = await one<{ c: string }>("SELECT COALESCE(SUM(cost_usd),0) AS c FROM usage WHERE run_id=$1", [id]);
   return Response.json({ run: { ...run, active: isRunActive(id), project, cost_usd: Number(cost?.c ?? 0) }, steps });

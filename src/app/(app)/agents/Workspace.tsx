@@ -4,13 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AGENT_BY_SLUG, DEFAULT_AGENT, POLES, type Agent } from "@/lib/agents";
 import { TIERS, type Tier } from "@/lib/pricing";
 import Markdown from "@/components/Markdown";
+import Activity, { type LiveProgress } from "@/components/Activity";
 import { api, MISSION_STATUS, streamPost, usd } from "@/components/api";
 
 type Source = { url: string; title: string };
 type Msg = { id?: number; role: "user" | "assistant"; text: string; sources?: Source[]; searches?: string[]; cost_usd?: string };
-type Mission = { id: string; agent_slug: string; project_id: string | null; title: string; status: string; tier: Tier; web_search: boolean; cost_usd: string; running?: boolean; run_id: string | null };
+type Mission = { id: string; agent_slug: string; project_id: string | null; title: string; status: string; tier: Tier; web_search: boolean; cost_usd: string; running?: boolean; run_id: string | null; progress?: LiveProgress | null };
 type Project = { id: string; name: string };
-type Live = { text: string; searches: string[]; results: number };
+type Live = { text: string; searches: string[]; results: number; phase: LiveProgress["phase"]; startedAt: number };
 
 export default function Workspace() {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function Workspace() {
     const tick = async () => {
       try {
         const m = await loadMission(missionParam);
-        if (!stop && (m.running || m.status === "en_cours")) timer = setTimeout(tick, 4000);
+        if (!stop && (m.running || m.status === "en_cours")) timer = setTimeout(tick, 2000);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Mission introuvable.");
       }
@@ -90,7 +91,7 @@ export default function Workspace() {
     setError("");
     setMessages((m) => [...m, { role: "user", text: t }]);
     setText("");
-    setLive({ text: "", searches: [], results: 0 });
+    setLive({ text: "", searches: [], results: 0, phase: "thinking", startedAt: Date.now() });
     let currentId = mission?.id ?? null;
     try {
       const url = mission ? `/api/missions/${mission.id}/messages` : "/api/missions";
@@ -100,9 +101,9 @@ export default function Workspace() {
           currentId = d.id;
           liveId.current = d.id;
         }
-        else if (ev === "text") setLive((l) => (l ? { ...l, text: l.text + d.delta } : l));
-        else if (ev === "search") setLive((l) => (l ? { ...l, searches: [...l.searches, d.query] } : l));
-        else if (ev === "results") setLive((l) => (l ? { ...l, results: l.results + d.count } : l));
+        else if (ev === "text") setLive((l) => (l ? { ...l, text: l.text + d.delta, phase: (l.text + d.delta).trim() ? "writing" : l.phase } : l));
+        else if (ev === "search") setLive((l) => (l ? { ...l, searches: [...l.searches, d.query], phase: "searching" } : l));
+        else if (ev === "results") setLive((l) => (l ? { ...l, results: l.results + d.count, phase: "reading" } : l));
         else if (ev === "error") setError(d.message);
       });
     } catch (e) {
@@ -241,15 +242,25 @@ export default function Workspace() {
                   <span className="dot" style={{ ["--c" as string]: agent.pole.color }} />
                   {agent.name}
                 </div>
-                {live.searches.length > 0 && (
-                  <div className="searches">
-                    {live.searches.map((s, i) => (
-                      <span key={i} className="search-chip">Recherche : {s}</span>
-                    ))}
-                    {live.results > 0 && <span className="muted small">{live.results} résultats lus</span>}
+                <Activity
+                  compact={!!live.text}
+                  color={agent.pole.color}
+                  progress={{ phase: live.phase, searches: live.searches, results: live.results, chars: live.text.length, preview: "", elapsedMs: Date.now() - live.startedAt }}
+                />
+                {live.text && (
+                  <div style={{ marginTop: 14 }}>
+                    <Markdown text={live.text} />
                   </div>
                 )}
-                {live.text ? <Markdown text={live.text} /> : <p className="thinking">L&apos;agent réfléchit{web ? " et cherche sur le web" : ""}…</p>}
+              </div>
+            )}
+            {!live && mission?.status === "en_cours" && (
+              <div className="msg a">
+                <div className="who">
+                  <span className="dot" style={{ ["--c" as string]: agent.pole.color }} />
+                  {agent.name}
+                </div>
+                <Activity progress={mission.progress ?? null} color={agent.pole.color} />
               </div>
             )}
           </div>

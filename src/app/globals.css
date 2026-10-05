@@ -299,3 +299,61 @@ table.data td.num { font-variant-numeric: tabular-nums; text-align: right; }
 
 /* Chargement : lignes fantômes qui respirent */
 .skeleton { height: 64px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); animation: breathe 1.8s ease-in-out infinite; }
+
+/* Suivi en direct d'un agent */
+.activity { --c: var(--accent); margin-top: 10px; border-radius: var(--r-md); background: var(--sunk); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; }
+.activity::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--c), transparent); background-size: 40% 100%; background-repeat: no-repeat; animation: sweep 1.8s var(--ease) infinite; opacity: 0.8; }
+@keyframes sweep { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+.act-head { display: flex; align-items: center; gap: 12px; }
+.act-title { font-weight: 600; font-size: 0.95rem; }
+.act-time { margin-left: auto; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.act-dots b { display: inline-block; animation: dot 1.4s infinite; font-weight: 700; }
+.act-dots b:nth-child(2) { animation-delay: 0.2s; }
+.act-dots b:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot { 0%, 60%, 100% { opacity: 0.2; transform: none; } 30% { opacity: 1; transform: translateY(-2px); } }
+
+/* Orbe : chaque phase a son mouvement */
+.act-orb { position: relative; width: 26px; height: 26px; flex: none; }
+.act-orb i { position: absolute; inset: 0; border-radius: 50%; background: var(--c); }
+.act-orb.thinking i:nth-child(1) { animation: pulse 1.8s var(--ease) infinite; opacity: 0.25; }
+.act-orb.thinking i:nth-child(2) { inset: 7px; animation: pulse 1.8s var(--ease) 0.3s infinite; opacity: 0.6; }
+.act-orb.thinking i:nth-child(3) { inset: 10px; }
+@keyframes pulse { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.15); } }
+.act-orb.searching i, .act-orb.reading i { inset: 9px; animation: orbit 1.3s linear infinite; transform-origin: 4px 4px; }
+.act-orb.searching i:nth-child(1), .act-orb.reading i:nth-child(1) { inset: 0; background: transparent; border: 2px solid var(--c); opacity: 0.35; animation: none; }
+.act-orb.searching i:nth-child(3), .act-orb.reading i:nth-child(3) { animation-delay: -0.65s; opacity: 0.5; }
+@keyframes orbit { from { transform: rotate(0deg) translateX(9px); } to { transform: rotate(360deg) translateX(9px); } }
+.act-orb.writing i { inset: auto; bottom: 6px; width: 5px; height: 14px; border-radius: 3px; animation: bars 0.9s var(--ease) infinite; }
+.act-orb.writing i:nth-child(1) { left: 3px; }
+.act-orb.writing i:nth-child(2) { left: 10px; animation-delay: 0.15s; }
+.act-orb.writing i:nth-child(3) { left: 17px; animation-delay: 0.3s; }
+@keyframes bars { 0%, 100% { transform: scaleY(0.4); transform-origin: bottom; } 50% { transform: scaleY(1); transform-origin: bottom; } }
+
+/* Frise des phases */
+.act-steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.act-steps li { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; padding: 4px 10px; border-radius: 999px; color: var(--muted); background: var(--surface); transition: all 0.5s var(--ease); }
+.act-pip { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); }
+.act-steps li.done { color: var(--ink); }
+.act-steps li.done .act-pip { background: var(--ok); }
+.act-steps li.skip { opacity: 0.45; text-decoration: line-through; }
+.act-steps li.now { color: var(--ink); font-weight: 600; box-shadow: 0 0 0 1.5px var(--c); }
+.act-steps li.now .act-pip { background: var(--c); animation: pulse 1.2s var(--ease) infinite; }
+
+.act-searches { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.act-query { font-size: 0.82rem; background: var(--surface); border-radius: 999px; padding: 3px 11px; color: var(--muted); animation: rise 0.5s var(--ease) both; }
+.act-query.live { color: var(--ink); box-shadow: 0 0 0 1px var(--c); }
+.act-preview { position: relative; max-height: 4.8em; overflow: hidden; font-size: 0.88rem; color: var(--muted); line-height: 1.6; -webkit-mask-image: linear-gradient(180deg, transparent, #000 45%); mask-image: linear-gradient(180deg, transparent, #000 45%); display: flex; flex-direction: column; justify-content: flex-end; }
+.act-caret { display: inline-block; width: 2px; height: 1em; background: var(--c); margin-left: 2px; vertical-align: -2px; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.act-meta { display: flex; gap: 14px; flex-wrap: wrap; }
+.activity.compact { padding: 10px 12px; gap: 8px; }
+
+/* Barre d'avancement d'un plan */
+.run-progress { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.run-bar { height: 8px; border-radius: 8px; background: var(--sunk); overflow: hidden; position: relative; }
+.run-bar > span { display: block; height: 100%; border-radius: 8px; background: var(--accent); transition: width 0.9s var(--ease); }
+.run-bar.live > span { background-image: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%); background-size: 200% 100%; background-color: var(--accent); animation: shine 1.6s linear infinite; }
+@keyframes shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.step.is-running { box-shadow: 0 0 0 1.5px var(--accent), var(--shadow-lift); }
+.step.is-done .n { background: var(--ok-soft); color: var(--ok); }
+.step.is-running .n { background: var(--accent); color: var(--accent-ink); }

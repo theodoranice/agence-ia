@@ -6,6 +6,7 @@ import { runAgent, type AgentEvent, type AgentResult, type Turn } from "./claude
 import { costUsd, modelFor, type Tier } from "./pricing";
 import { systemPrompt } from "./prompt";
 import type { User } from "./auth";
+import { endProgress, startProgress, trackProgress } from "./progress";
 
 export type MissionRow = {
   id: string;
@@ -90,15 +91,20 @@ export async function executeMission(opts: {
   const system = systemPrompt({ agent, companyContext: user.company_context, project, webSearch: mission.web_search });
   const ctl = new AbortController();
   running.set(mission.id, ctl);
+  startProgress(mission.id);
+  const onEvent = (e: AgentEvent) => {
+    trackProgress(mission.id, e);
+    opts.onEvent?.(e);
+  };
 
   try {
     let result: AgentResult;
     try {
-      result = await runAgent({ model, system, turns: await history(mission.id, mission.web_search), webSearch: mission.web_search, onEvent: opts.onEvent, signal: ctl.signal });
+      result = await runAgent({ model, system, turns: await history(mission.id, mission.web_search), webSearch: mission.web_search, onEvent, signal: ctl.signal });
     } catch (e) {
       // Si l'historique brut est refusé (rare), on réessaie avec un historique texte seul.
       if (e instanceof Anthropic.BadRequestError) {
-        result = await runAgent({ model, system, turns: await history(mission.id, false), webSearch: mission.web_search, onEvent: opts.onEvent, signal: ctl.signal });
+        result = await runAgent({ model, system, turns: await history(mission.id, false), webSearch: mission.web_search, onEvent, signal: ctl.signal });
       } else throw e;
     }
     const cost = costUsd(model, result.usage);
@@ -115,6 +121,7 @@ export async function executeMission(opts: {
     throw e;
   } finally {
     running.delete(mission.id);
+    endProgress(mission.id);
   }
 }
 

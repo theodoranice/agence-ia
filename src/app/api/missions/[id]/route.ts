@@ -2,6 +2,7 @@ import { handle, HttpError, requireUser } from "@/lib/auth";
 import { body, type Ctx } from "@/lib/http";
 import { q } from "@/lib/db";
 import { getOwnedMission, isRunning } from "@/lib/missions";
+import { getProgress } from "@/lib/progress";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,7 +16,7 @@ export const GET = handle(async (_req: Request, ctx: Ctx) => {
     "SELECT id, role, text, sources, searches, model, cost_usd, created_at FROM messages WHERE mission_id=$1 ORDER BY id",
     [id],
   );
-  return Response.json({ mission: { ...m, running: isRunning(id) }, messages });
+  return Response.json({ mission: { ...m, running: isRunning(id), progress: getProgress(id) }, messages });
 });
 
 export const PATCH = handle(async (req: Request, ctx: Ctx) => {
