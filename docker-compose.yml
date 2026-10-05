@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: agence
+      POSTGRES_USER: agence
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Renseigne POSTGRES_PASSWORD dans .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agence -d agence"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_BRAND: ${NEXT_PUBLIC_BRAND:-Tech Teranga}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://agence:${POSTGRES_PASSWORD}@db:5432/agence
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+
+volumes:
+  pgdata:
