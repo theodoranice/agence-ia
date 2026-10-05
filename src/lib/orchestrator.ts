@@ -82,7 +82,7 @@ export function cancelRun(runId: string) {
   if (a) a.cancelled = true;
 }
 
-const MAX_CONTEXT_PER_STEP = 6000;
+const MAX_CONTEXT_PER_STEP = Number(process.env.MAX_CONTEXT_PER_STEP || 14000);
 
 /** Exécute les étapes une par une, chacune recevant les livrables des précédentes. */
 export async function executeRun(runId: string) {

@@ -28,7 +28,7 @@ export type AgentResult = {
 // Paramètres d'un tour de conversation : texte simple, ou blocs bruts d'un tour précédent.
 export type Turn = { role: "user" | "assistant"; content: string | unknown[] };
 
-const MAX_TOKENS = Number(process.env.MAX_TOKENS || 8000);
+const MAX_TOKENS = Number(process.env.MAX_TOKENS || 16000);
 const MAX_SEARCHES = Number(process.env.MAX_SEARCHES_PER_MISSION || 5);
 
 // La localisation des recherches n'accepte qu'une liste limitée de pays (le Sénégal n'en fait
