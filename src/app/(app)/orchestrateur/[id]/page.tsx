@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AGENT_BY_SLUG, POLES } from "@/lib/agents";
 import Markdown from "@/components/Markdown";
 import { api, RUN_STATUS, STEP_STATUS, usd } from "@/components/api";
+import Skeleton from "@/components/Skeleton";
 
 type Run = { id: string; goal: string; summary: string; status: string; tier: string; web_search: boolean; error: string | null; active: boolean; project: { id: string; name: string } | null; cost_usd: number };
 type Step = { id: string; idx: number; agent_slug: string; mission: string; why: string; status: string; mission_id: string | null; error: string | null; mission_cost: string | null };
@@ -102,7 +103,7 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
     }
   }
 
-  if (!run) return error ? <div className="alert err">{error}</div> : <p className="muted">Chargement…</p>;
+  if (!run) return error ? <div className="alert err">{error}</div> : <Skeleton />;
 
   const doneCount = steps.filter((s) => s.status === "done").length;
 

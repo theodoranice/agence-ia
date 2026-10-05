@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api, usd, xof } from "@/components/api";
+import Skeleton from "@/components/Skeleton";
 
 type U = {
   id: string; email: string; name: string; role: string; monthly_budget_usd: string | null; active: boolean;
@@ -66,7 +67,7 @@ export default function AdminPanel({ meId }: { meId: string }) {
     return Array.from(a, (n) => chars[n % chars.length]).join("");
   }
 
-  if (!data) return error ? <div className="alert err">{error}</div> : <p className="muted">Chargement…</p>;
+  if (!data) return error ? <div className="alert err">{error}</div> : <Skeleton />;
   const rate = data.usdToXof;
 
   return (

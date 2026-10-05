@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AGENT_BY_SLUG } from "@/lib/agents";
 import { api, MISSION_STATUS, usd, when } from "@/components/api";
+import Skeleton from "@/components/Skeleton";
 
 type Row = { id: string; agent_slug: string; title: string; status: string; cost_usd: string; updated_at: string; project_name: string | null; replies: string; run_id: string | null };
 
@@ -43,7 +44,7 @@ export default function MissionsPage() {
       </div>
       {error && <div className="alert err">{error}</div>}
       {rows === null ? (
-        <p className="muted">Chargement…</p>
+        <Skeleton />
       ) : rows.length === 0 ? (
         <div className="empty">
           {filter === "actives" ? (

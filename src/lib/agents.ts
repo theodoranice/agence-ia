@@ -9,7 +9,7 @@ type Raw = [string, string, string, string, Priority];
 type RawPole = Omit<Pole, "agents"> & { agents: Raw[] };
 
 const RAW: RawPole[] = [
-  { id: "eng", name: "Engineering", color: "#3B5BDB", mission: "Construire et livrer les SaaS et projets clients",
+  { id: "eng", name: "Engineering", color: "#5B7DB8", mission: "Construire et livrer les SaaS et projets clients",
     templates: ["Propose l'architecture technique (stack, modules, schéma de données) pour ", "Revois ce code et liste les problèmes par gravité, avec le correctif :\n\n", "Écris le schéma PostgreSQL et les migrations pour "],
     agents: [
       ["engineering-backend-architect", "Backend Architect", "Architecture API et base de données des SaaS", "RestaurantOS, SaaS WhatsApp, LUMEN RISE", "P1"],
@@ -27,7 +27,7 @@ const RAW: RawPole[] = [
       ["specialized-mcp-builder", "MCP Builder", "Serveurs MCP pour brancher tes outils à Claude", "Agents e-com, outils internes", "P3"],
       ["testing-api-tester", "API Tester", "Tests des endpoints et des intégrations", "SaaS WhatsApp, CLAVIS", "P3"],
     ] },
-  { id: "sec", name: "Sécurité & Infra", color: "#5F3DC4", mission: "Sécuriser les SaaS et l'infrastructure",
+  { id: "sec", name: "Sécurité & Infra", color: "#7D6FB0", mission: "Sécuriser les SaaS et l'infrastructure",
     templates: ["Fais la checklist de sécurité avant mise en production de ", "Prépare un plan de réponse à incident pour ", "Rédige une procédure de durcissement pour "],
     agents: [
       ["security-ai-generated-code-auditor", "AI-Generated Code Security Auditor", "Audit du code généré par IA : secrets en dur, RLS, injection de prompt", "Tous les projets codés avec l'IA", "P1"],
@@ -40,7 +40,7 @@ const RAW: RawPole[] = [
       ["security-threat-detection-engineer", "Threat Detection Engineer", "Règles SIEM, threat hunting", "MICROSEN", "P3"],
       ["engineering-it-service-manager", "IT Service Manager", "ITIL 4 : incidents, changements, SLA, CMDB", "MICROSEN", "P3"],
     ] },
-  { id: "mkt", name: "Digital & Marketing", color: "#0C8599", mission: "Faire connaître la marque et ses produits",
+  { id: "mkt", name: "Digital & Marketing", color: "#4A8F8F", mission: "Faire connaître la marque et ses produits",
     templates: ["Écris 5 posts LinkedIn prêts à publier sur ", "Prépare un calendrier éditorial d'un mois pour ", "Fais un audit SEO et un plan d'action pour "],
     agents: [
       ["marketing-content-creator", "Content Creator", "Stratégie de contenu et calendrier éditorial", "Tech Teranga, CyberLearn", "P1"],
@@ -53,7 +53,7 @@ const RAW: RawPole[] = [
       ["marketing-email-strategist", "Email Marketing Strategist", "Séquences email, segmentation, délivrabilité", "Produits Tech Teranga, LUMEN RISE", "P3"],
       ["marketing-ai-citation-strategist", "AI Citation Strategist", "Visibilité dans ChatGPT, Claude, Perplexity", "Tech Teranga", "P3"],
     ] },
-  { id: "ecom", name: "E-commerce", color: "#E67700", mission: "Trouver, vendre et servir",
+  { id: "ecom", name: "E-commerce", color: "#C08A45", mission: "Trouver, vendre et servir",
     templates: ["Trouve 10 idées de produits gagnants pour le marché sénégalais dans la niche ", "Écris un script de closing WhatsApp (relances incluses) pour ", "Fixe le prix en FCFA et calcule la marge pour "],
     agents: [
       ["product-trend-researcher", "Trend Researcher", "Recherche de produits gagnants et de tendances", "Agent 1 · Recherche produit", "P1"],
@@ -66,7 +66,7 @@ const RAW: RawPole[] = [
       ["retail-customer-returns", "Retail Customer Returns", "Retours, échanges, prévention de la fraude", "Boutiques e-com", "P3"],
       ["marketing-cross-border-ecommerce", "Cross-Border E-Commerce Specialist", "Sourcing à l'import et logistique", "E-com", "P3"],
     ] },
-  { id: "crea", name: "Création & Créatives", color: "#D6336C", mission: "Visuels, pubs et identité de marque",
+  { id: "crea", name: "Création & Créatives", color: "#B8657F", mission: "Visuels, pubs et identité de marque",
     templates: ["Propose 5 concepts de pub Meta (hook, visuel, texte) pour ", "Écris 6 prompts d'images détaillés pour ", "Définis la charte de marque (ton, couleurs, typo) de "],
     agents: [
       ["paid-media-creative-strategist", "Ad Creative Strategist", "Concepts de pubs, hooks, tests créatifs", "Agent 2 · Créatif", "P1"],
@@ -77,7 +77,7 @@ const RAW: RawPole[] = [
       ["design-visual-storyteller", "Visual Storyteller", "Narration visuelle de marque", "Tech Teranga, LUMEN RISE", "P3"],
       ["marketing-carousel-growth-engine", "Carousel Growth Engine", "Carrousels Instagram et TikTok", "Tech Teranga, E-com", "P3"],
     ] },
-  { id: "yt", name: "YouTube Automation", color: "#E03131", mission: "Produire et faire croître les chaînes vidéo",
+  { id: "yt", name: "YouTube Automation", color: "#B4605F", mission: "Produire et faire croître les chaînes vidéo",
     templates: ["Écris le script d'une vidéo de 8 minutes sur la légende de ", "Propose 10 titres et concepts de miniature pour une vidéo sur ", "Découpe cette vidéo en 3 Shorts : "],
     agents: [
       ["marketing-video-optimization-specialist", "Video Optimization Specialist", "SEO YouTube, chapitres, concepts de miniatures, rétention", "Mythoria", "P1"],
@@ -87,7 +87,7 @@ const RAW: RawPole[] = [
       ["specialized-focus-music-architect", "Focus Music Architect", "Prompts de musique d'ambiance générative", "Mythoria", "P3"],
       ["project-management-experiment-tracker", "Experiment Tracker", "A/B tests des titres et miniatures", "Mythoria", "P3"],
     ] },
-  { id: "sales", name: "Ventes & Clients", color: "#2B8A3E", mission: "Signer et garder les clients",
+  { id: "sales", name: "Ventes & Clients", color: "#5E9670", mission: "Signer et garder les clients",
     templates: ["Rédige une proposition commerciale pour ", "Crée une séquence de prospection en 4 messages pour ", "Prépare les questions de découverte pour un rendez-vous avec "],
     agents: [
       ["sales-outbound-strategist", "Outbound Strategist", "Prospection ciblée PME et institutions", "Agence", "P1"],
@@ -96,7 +96,7 @@ const RAW: RawPole[] = [
       ["sales-engineer", "Sales Engineer", "Démos techniques, cadrage de POC", "SaaS WhatsApp, RestaurantOS", "P2"],
       ["customer-success-manager", "Customer Success Manager", "Onboarding des clients SaaS, rétention", "SaaS WhatsApp, RestaurantOS, CLAVIS", "P3"],
     ] },
-  { id: "pilot", name: "Pilotage & Admin", color: "#5C677D", mission: "Coordonner, suivre les chiffres, rester conforme",
+  { id: "pilot", name: "Pilotage & Admin", color: "#7C8693", mission: "Coordonner, suivre les chiffres, rester conforme",
     templates: ["Découpe ce projet en tâches priorisées avec estimation : ", "Fais une synthèse exécutive d'une page de ", "Construis un budget mensuel simple pour "],
     agents: [
       ["agents-orchestrator", "Agents Orchestrator", "Coordonne plusieurs agents sur un projet complexe", "Tous", "P1"],

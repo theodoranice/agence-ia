@@ -52,14 +52,16 @@ export default function Shell({ user, budget, children }: Props) {
                 </div>
               )}
             </div>
-            <span>{user.name}</span>
-            <button type="button" className="btn sm" onClick={logout}>
+            <span className="me-name">{user.name}</span>
+            <button type="button" className="btn sm ghost" onClick={logout}>
               Déconnexion
             </button>
           </div>
         </div>
       </header>
-      <main className="page">{children}</main>
+      <main className="page enter" key={path.split("/")[1] || "home"}>
+        {children}
+      </main>
     </>
   );
 }

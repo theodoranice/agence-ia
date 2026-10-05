@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api } from "@/components/api";
+import Skeleton from "@/components/Skeleton";
 
 type Project = { id: string; name: string; description: string; missions: string };
 
@@ -74,7 +75,7 @@ export default function ProjectsPage() {
       {error && <div className="alert err" style={{ marginBottom: 14 }}>{error}</div>}
 
       {items === null ? (
-        <p className="muted">Chargement…</p>
+        <Skeleton />
       ) : items.length === 0 ? (
         <div className="empty">Aucun projet. Crée le premier ci-dessus pour donner du contexte à tes agents.</div>
       ) : (

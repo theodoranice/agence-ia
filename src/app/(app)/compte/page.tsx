@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api, usd, xof } from "@/components/api";
+import Skeleton from "@/components/Skeleton";
 
 type Me = {
   user: { name: string; email: string; role: string; company_context: string };
@@ -37,7 +38,7 @@ export default function AccountPage() {
     }
   }
 
-  if (!me) return <p className="muted">Chargement…</p>;
+  if (!me) return <Skeleton />;
 
   return (
     <>

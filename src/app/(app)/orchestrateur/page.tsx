@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TIERS, type Tier } from "@/lib/pricing";
 import { api, RUN_STATUS, usd, when } from "@/components/api";
+import Skeleton from "@/components/Skeleton";
 
 type Run = { id: string; goal: string; summary: string; status: string; project_name: string | null; steps: string; done: string; cost_usd: string; created_at: string };
 type Project = { id: string; name: string };
@@ -88,7 +89,7 @@ export default function OrchestratorPage() {
 
       <h2 style={{ fontSize: "1.15rem", marginBottom: 12 }}>Plans</h2>
       {runs === null ? (
-        <p className="muted">Chargement…</p>
+        <Skeleton />
       ) : runs.length === 0 ? (
         <div className="empty">Aucun plan pour l&apos;instant. Décris un objectif ci-dessus pour obtenir le premier.</div>
       ) : (
