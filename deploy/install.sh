@@ -21,8 +21,16 @@ docker compose version >/dev/null 2>&1 || die "le plugin « docker compose » es
 # 2. Fichier .env (créé une seule fois ; une mise à jour le conserve)
 if [ ! -f .env ]; then
   say "Configuration (les saisies masquées ne s'affichent pas)"
-  read -rsp "Clé API Anthropic (sk-ant-...) : " API_KEY; echo
-  [[ "$API_KEY" == sk-ant-* ]] || die "la clé doit commencer par sk-ant-."
+  echo "Pour coller dans ce terminal : Ctrl+Shift+V, ou clic droit > Coller."
+  while :; do
+    read -rsp "Clé API Anthropic (sk-ant-...) : " API_KEY; echo
+    API_KEY="$(printf '%s' "$API_KEY" | tr -d '[:space:]')"
+    if [[ "$API_KEY" == sk-ant-* ]] && [ ${#API_KEY} -ge 40 ]; then
+      echo "Clé reçue : ${API_KEY:0:10}… (${#API_KEY} caractères)"
+      break
+    fi
+    echo "Clé non reçue ou incomplète (${#API_KEY} caractères). Réessaie."
+  done
   read -rp "E-mail administrateur [tech.terangasn@gmail.com] : " ADMIN_EMAIL
   ADMIN_EMAIL="${ADMIN_EMAIL:-tech.terangasn@gmail.com}"
   read -rp "Nom affiché [Théo] : " ADMIN_NAME
