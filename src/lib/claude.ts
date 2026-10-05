@@ -31,18 +31,36 @@ export type Turn = { role: "user" | "assistant"; content: string | unknown[] };
 const MAX_TOKENS = Number(process.env.MAX_TOKENS || 8000);
 const MAX_SEARCHES = Number(process.env.MAX_SEARCHES_PER_MISSION || 5);
 
+// La localisation des recherches n'accepte qu'une liste limitée de pays (le Sénégal n'en fait
+// pas partie). Elle est donc facultative : si l'API la refuse, on la désactive et on relance.
+let locationRejected = false;
+
+function searchLocation() {
+  if (locationRejected) return undefined;
+  const country = (process.env.SEARCH_COUNTRY || "").trim().toUpperCase();
+  const city = (process.env.SEARCH_CITY || "").trim();
+  const timezone = (process.env.SEARCH_TIMEZONE || "").trim();
+  if (!country && !city && !timezone) return undefined;
+  return {
+    type: "approximate" as const,
+    ...(country ? { country } : {}),
+    ...(city ? { city } : {}),
+    ...(timezone ? { timezone } : {}),
+  };
+}
+
 function webSearchTool() {
+  const loc = searchLocation();
   return {
     type: "web_search_20250305" as const,
     name: "web_search" as const,
     max_uses: MAX_SEARCHES,
-    user_location: {
-      type: "approximate" as const,
-      city: process.env.SEARCH_CITY || "Dakar",
-      country: process.env.SEARCH_COUNTRY || "SN",
-      timezone: process.env.SEARCH_TIMEZONE || "Africa/Dakar",
-    },
+    ...(loc ? { user_location: loc } : {}),
   };
+}
+
+function isLocationError(e: unknown) {
+  return e instanceof Anthropic.BadRequestError && /user_location|country code|not supported|timezone|city/i.test(String((e as Error).message));
 }
 
 export async function runAgent(opts: {
@@ -55,7 +73,7 @@ export async function runAgent(opts: {
 }): Promise<AgentResult> {
   const client = anthropic();
   const emit = opts.onEvent ?? (() => {});
-  const tools = opts.webSearch ? [webSearchTool()] : undefined;
+  let tools = opts.webSearch ? [webSearchTool()] : undefined;
   const base = opts.turns as Anthropic.MessageParam[];
 
   const content: Anthropic.ContentBlock[] = [];
@@ -66,6 +84,7 @@ export async function runAgent(opts: {
   let stopReason: string | null = null;
 
   // Une recherche longue peut s'arrêter en "pause_turn" : on relance avec le contenu déjà produit.
+  let locationRetried = false;
   for (let round = 0; round < 5; round++) {
     const messages: Anthropic.MessageParam[] = content.length
       ? [...base, { role: "assistant", content: content as unknown as Anthropic.ContentBlockParam[] }]
@@ -83,7 +102,11 @@ export async function runAgent(opts: {
     );
 
     const toolInput: Record<number, string> = {};
+    let gotEvent = false;
+    let msg: Anthropic.Message;
+    try {
     for await (const ev of stream) {
+      gotEvent = true;
       if (ev.type === "content_block_start") {
         const b = ev.content_block;
         if (b.type === "text") {
@@ -120,7 +143,19 @@ export async function runAgent(opts: {
       }
     }
 
-    const msg = await stream.finalMessage();
+    msg = await stream.finalMessage();
+    } catch (e) {
+      // Localisation refusée par l'API : on la retire et on relance ce tour une seule fois.
+      if (!gotEvent && !locationRetried && tools && isLocationError(e)) {
+        locationRejected = true;
+        locationRetried = true;
+        tools = [webSearchTool()];
+        console.warn("[claude] Localisation de recherche refusée par l'API ; recherche sans localisation.");
+        round--;
+        continue;
+      }
+      throw e;
+    }
     content.push(...msg.content);
     usage.input_tokens += msg.usage.input_tokens ?? 0;
     usage.output_tokens += msg.usage.output_tokens ?? 0;
