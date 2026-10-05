@@ -43,5 +43,6 @@ export async function init() {
   await q("UPDATE missions SET status='echec' WHERE status='en_cours'");
   await q("UPDATE run_steps SET status='failed', error='Interrompu par un redémarrage du serveur.' WHERE status='running'");
   await q("UPDATE runs SET status='failed', error='Interrompu par un redémarrage du serveur. Tu peux relancer le plan.' WHERE status='running'");
+  await q("UPDATE studio_videos SET status='failed', error='Interrompu par un redémarrage du serveur. Relance la génération : les éléments déjà produits sont réutilisés.' WHERE status IN ('rendering','scripting')");
   await q("DELETE FROM sessions WHERE expires_at < now()");
 }

@@ -90,6 +90,27 @@ Les résultats de recherche comptent aussi en tokens d'entrée. Une mission Stan
 
 La facture de la Console Anthropic fait foi. Les montants de l'application sont des estimations.
 
+## 5 bis. Studio vidéo
+
+Le Studio fabrique des vidéos prêtes à publier :
+
+- **Short vente** (9:16, 15 à 60 s) : accroche, produit mis en scène à partir de tes photos, appel à l'action
+- **Short éducatif** (9:16, 20 à 90 s) : une idée claire, des étapes, sous-titres mot à mot
+- **Narration longue** (16:9, 1 à 15 min) : pour Mythoria ou des formats YouTube classiques
+
+Chaque vidéo passe par un storyboard modifiable (texte, visuel, ordre des scènes) avant la génération. Le coût est estimé avant de lancer.
+
+**Mise en route**
+1. Crée un compte sur fal.ai, ajoute du crédit, puis colle la clé dans **Administration > Fournisseurs vidéo**.
+2. Dans **Studio > Mon avatar**, envoie une photo de face et enregistre 20 à 30 s de ta voix, puis coche le consentement.
+3. Clique sur « Écouter ma voix clonée » pour vérifier le rendu, puis crée ta première vidéo.
+
+**Coûts indicatifs** (fal.ai, à l'usage) : un Short de 35 s avec avatar revient à environ 0,80 à 1,50 $ ; une narration de 8 min en images animées à environ 1 à 2 $.
+
+**Règles** : l'avatar et la voix ne peuvent être que les tiens (consentement obligatoire). Coche l'option « contenu généré par IA » de TikTok ou YouTube au moment de publier. N'invente pas de témoignages ni de chiffres dans les vidéos de vente.
+
+Les fichiers sont gardés dans le volume Docker `media`.
+
 ## 6. Exploitation
 
 ```bash

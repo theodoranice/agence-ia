@@ -26,8 +26,11 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://agence:${POSTGRES_PASSWORD}@db:5432/agence
+    volumes:
+      - media:/app/media
     ports:
       - "127.0.0.1:${APP_PORT:-3000}:3000"
 
 volumes:
   pgdata:
+  media:

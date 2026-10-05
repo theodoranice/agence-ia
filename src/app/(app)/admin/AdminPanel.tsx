@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api, usd, xof } from "@/components/api";
+import Providers from "./Providers";
 import Skeleton from "@/components/Skeleton";
 
 type U = {
@@ -76,6 +77,8 @@ export default function AdminPanel({ meId }: { meId: string }) {
         <h1>Administration</h1>
         <p>Comptes, budgets mensuels et consommation de l&apos;API. Les budgets se renouvellent le 1er de chaque mois ; laisse le champ vide pour un budget illimité.</p>
       </div>
+
+      <Providers />
 
       <div className="kpis">
         <div className="kpi"><b>{usd(data.totals.cost_usd)}</b><span>Coût API ce mois · {xof(data.totals.cost_usd, rate)}</span></div>

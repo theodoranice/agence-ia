@@ -105,3 +105,49 @@ CREATE TABLE IF NOT EXISTS usage (
   created_at    timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS usage_user_month_idx ON usage(user_id, created_at);
+
+-- ---------------------------------------------------------------- Studio vidéo
+CREATE TABLE IF NOT EXISTS app_settings (
+  key         text PRIMARY KEY,
+  value_enc   text NOT NULL,              -- chiffré (AES-256-GCM)
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS studio_profiles (
+  user_id           uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  display_name      text NOT NULL DEFAULT '',
+  photo_path        text,                 -- relatif à MEDIA_DIR
+  photo_remote_url  text,                 -- copie hébergée chez le fournisseur
+  photo_remote_at   timestamptz,
+  voice_provider    text NOT NULL DEFAULT 'chatterbox' CHECK (voice_provider IN ('chatterbox','elevenlabs')),
+  voice_sample_path text,
+  voice_remote_url  text,
+  voice_remote_at   timestamptz,
+  eleven_voice_id   text,
+  voice_language    text NOT NULL DEFAULT 'french',
+  consent_at        timestamptz,          -- l'utilisateur certifie que c'est sa propre image et sa propre voix
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS studio_videos (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  project_id    uuid REFERENCES projects(id) ON DELETE SET NULL,
+  run_id        uuid REFERENCES runs(id) ON DELETE SET NULL,
+  format        text NOT NULL,
+  title         text NOT NULL DEFAULT '',
+  brief         jsonb NOT NULL DEFAULT '{}',
+  storyboard    jsonb,
+  status        text NOT NULL DEFAULT 'scripting'
+                CHECK (status IN ('scripting','ready','rendering','done','failed','cancelled')),
+  progress      jsonb NOT NULL DEFAULT '{}',
+  output_path   text,
+  thumb_path    text,
+  estimate_usd  numeric(12,6) NOT NULL DEFAULT 0,
+  cost_usd      numeric(12,6) NOT NULL DEFAULT 0,
+  error         text,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS studio_videos_user_idx ON studio_videos(user_id, updated_at DESC);
+ALTER TABLE usage ADD COLUMN IF NOT EXISTS video_id uuid REFERENCES studio_videos(id) ON DELETE SET NULL;

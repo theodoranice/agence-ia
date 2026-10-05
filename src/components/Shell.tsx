@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/agents", label: "Agents" },
   { href: "/orchestrateur", label: "Orchestrateur" },
   { href: "/missions", label: "Missions" },
+  { href: "/studio", label: "Studio" },
   { href: "/projets", label: "Projets" },
   { href: "/compte", label: "Compte" },
 ];

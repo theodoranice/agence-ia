@@ -129,15 +129,16 @@ export async function recordUsage(o: {
   userId: string;
   missionId?: string | null;
   runId?: string | null;
-  kind: "mission" | "plan";
+  kind: "mission" | "plan" | "video";
+  videoId?: string | null;
   model: string;
   usage: AgentResult["usage"];
   cost: number;
 }) {
   await q(
-    `INSERT INTO usage (user_id, mission_id, run_id, kind, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, web_searches, cost_usd)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-    [o.userId, o.missionId ?? null, o.runId ?? null, o.kind, o.model, o.usage.input_tokens, o.usage.output_tokens, o.usage.cache_read_tokens, o.usage.cache_write_tokens, o.usage.web_searches, o.cost],
+    `INSERT INTO usage (user_id, mission_id, run_id, video_id, kind, model, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, web_searches, cost_usd)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [o.userId, o.missionId ?? null, o.runId ?? null, o.videoId ?? null, o.kind, o.model, o.usage.input_tokens, o.usage.output_tokens, o.usage.cache_read_tokens, o.usage.cache_write_tokens, o.usage.web_searches, o.cost],
   );
 }
 

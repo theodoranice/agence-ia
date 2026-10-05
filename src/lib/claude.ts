@@ -200,10 +200,10 @@ function collectSources(content: Anthropic.ContentBlock[]): Source[] {
 }
 
 /** Appel simple, sans outils, qui doit renvoyer du JSON. */
-export async function askJson<T>(opts: { model: string; prompt: string }): Promise<{ data: T; usage: Usage }> {
+export async function askJson<T>(opts: { model: string; prompt: string; maxTokens?: number }): Promise<{ data: T; usage: Usage }> {
   const msg = await anthropic().messages.create({
     model: opts.model,
-    max_tokens: 4000,
+    max_tokens: opts.maxTokens ?? 4000,
     messages: [{ role: "user", content: opts.prompt }],
   });
   const raw = msg.content.map((b) => (b.type === "text" ? b.text : "")).join("");

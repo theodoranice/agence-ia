@@ -153,6 +153,11 @@ export default function RunPage({ params }: { params: Promise<{ id: string }> })
             <button type="button" className="btn" onClick={startEdit}>Modifier les étapes</button>
           </>
         )}
+        {run.status === "done" && (
+          <Link className="btn primary" href={`/studio/nouvelle?run=${id}&format=long_narration${run.project ? `&project=${run.project.id}` : ""}`}>
+            Créer la vidéo avec ce plan
+          </Link>
+        )}
         {run.status === "running" && (
           <>
             <span className="muted small">Les agents travaillent. La page se met à jour toute seule ; tu peux la fermer.</span>
